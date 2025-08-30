@@ -3,66 +3,81 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Card Rounds Scorekeeper</title>
+  <title>حاسبة سكرو</title>
   <style>
     :root{
       --bg:#0f172a; --muted:#94a3b8; --text:#e5e7eb;
+      --panel:rgba(17,24,39,.7);
+      --border:rgba(148,163,184,.22);
       --brand:#22c55e; --danger:#ef4444; --accent:#38bdf8;
       --win-bg:rgba(34,197,94,0.15); --lose-bg:rgba(239,68,68,0.15);
+      --input:#0b1325;
+      --shadow:0 8px 24px rgba(0,0,0,.25);
     }
-    body{margin:0;background:linear-gradient(180deg,var(--bg),#0b1020 40%,#070b18);color:var(--text);font-family:Calibri, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    [data-theme="light"]{
+      --bg:#f7f9fc; --muted:#4b5563; --text:#0b1020;
+      --panel:#ffffff; --border:rgba(0,0,0,.18);
+      --brand:#16a34a; --danger:#dc2626; --accent:#0284c7;
+      --win-bg:rgba(34,197,94,0.2); --lose-bg:rgba(239,68,68,0.16);
+      --input:#ffffff; --shadow:0 8px 28px rgba(2,6,23,.12);
+    }
+
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Calibri, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
     .container{max-width:720px;margin:0 auto;padding:16px 14px 28px}
     header.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-    header.topbar .lang{background:#0b1325;border:1px solid rgba(148,163,184,.22);color:var(--text);border-radius:999px;padding:6px 10px;font-weight:600}
-    h1{font-size:28px;margin:10px 0 8px;letter-spacing:.3px}
-    .sub{color:var(--muted);font-size:14px;margin-bottom:14px}
-    .card{background:rgba(17,24,39,.7);backdrop-filter:blur(6px);border:1px solid rgba(148,163,184,.15);border-radius:18px;padding:14px;width:100%;box-sizing:border-box}
+    header.topbar .toggle{background:var(--input);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:6px 10px;font-weight:600}
+    h1{font-size:28px;margin:10px 0 4px;letter-spacing:.3px}
+    .sub{color:var(--muted);font-size:15px;margin-bottom:14px}
+    .card{background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:18px;padding:14px;width:100%;box-sizing:border-box;box-shadow:var(--shadow)}
     .row{display:flex;gap:10px;align-items:center}
     .stack{display:flex;flex-direction:column;gap:8px}
-    input[type="text"],input[type="number"]{background:#0b1325;border:1px solid rgba(148,163,184,.22);color:var(--text);padding:12px;border-radius:12px;font-size:16px;outline:none;width:100%;box-sizing:border-box;font-family:Calibri, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
-    input[type="number"]{appearance:textfield}
-    input::placeholder{color:#7a8aa7}
-    button{border:0;border-radius:12px;padding:10px 14px;font-weight:600;font-size:15px;white-space:nowrap;font-family:Calibri, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
-    .btn{background:var(--brand);color:#06210f}
-    .btn:disabled{opacity:.5}
-    .btn-secondary{background:#0b1325;color:var(--text);border:1px solid rgba(148,163,184,.22)}
+    input[type="text"],input[type="number"]{background:var(--input);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:12px;font-size:16px;outline:none;width:100%;box-sizing:border-box;font-family:Calibri, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    input::placeholder{color:#6b7280}
+    button{border:0;border-radius:12px;padding:10px 14px;font-weight:700;font-size:15px;white-space:nowrap;font-family:Calibri, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    .btn{background:var(--brand);color:#fff}
+    .btn:disabled{opacity:.6}
+    .btn-secondary{background:var(--input);color:var(--text);border:1px solid var(--border)}
     .btn-danger{background:#ef4444;color:#fff}
-    .btn-accent{background:#38bdf8;color:#052234}
-    .pill{background:#0b1325;border:1px solid rgba(148,163,184,.22);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+    .btn-accent{background:var(--accent);color:#fff}
+    .pill{background:var(--input);border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
 
-    /* Players list constrained to parent card width */
     .players{display:flex;flex-direction:column;gap:8px;margin-top:8px;width:100%}
-    .player-tag{display:flex;align-items:center;gap:10px;justify-content:space-between;background:#0b1325;border:1px solid rgba(148,163,184,.22);padding:10px 12px;border-radius:12px;width:100%;box-sizing:border-box}
+    .player-tag{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--input);border:1px solid var(--border);padding:10px 12px;border-radius:12px;width:100%;box-sizing:border-box}
     .player-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
     .small{font-size:12px;color:var(--muted)}
-    .footer-cta{position:sticky;bottom:0;left:0;right:0;padding-top:10px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.6) 30%,rgba(0,0,0,.9));backdrop-filter:blur(4px)}
+    .footer-cta{position:sticky;bottom:0;left:0;right:0;padding-top:10px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.05) 30%,rgba(0,0,0,.08));backdrop-filter:blur(4px)}
 
     .grid{display:grid;gap:10px}
     .grid-cols-2{grid-template-columns:1fr 1fr}
 
     .round-indicator{display:flex;gap:6px;align-items:center;margin:8px 0 2px}
-    .dot{width:10px;height:10px;border-radius:999px;background:#1f2a44;border:1px solid rgba(148,163,184,.25)}
+    .dot{width:10px;height:10px;border-radius:999px;background:#1f2a44;border:1px solid var(--border)}
     .dot.active{background:var(--accent)}
 
     .table{width:100%;border-collapse:separate;border-spacing:0 8px}
     .td{padding:12px}
-    .tr{background:#0b1325;border:1px solid rgba(148,163,184,.22);border-radius:12px}
+    .tr{background:var(--input);border:1px solid var(--border);border-radius:12px}
     .tr > .td:first-child{border-top-left-radius:12px;border-bottom-left-radius:12px}
     .tr > .td:last-child{border-top-right-radius:12px;border-bottom-right-radius:12px}
     .right{text-align:end}
 
-    /* Results boxes with highlights */
-    .result-box{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid rgba(148,163,184,.22);border-radius:12px;background:#0b1325;margin-top:6px}
+    .result-box{display:flex;align-items:center;justify-content:space-between;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--input);margin-top:6px}
     .winner{background:var(--win-bg);border-color:var(--brand)}
     .loser{background:var(--lose-bg);border-color:var(--danger)}
+
+    .celebrate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:50}
+    .celebrate .banner{background:var(--input);border:2px solid var(--brand);box-shadow:0 10px 40px rgba(0,0,0,.25);padding:18px 22px;border-radius:16px;font-size:22px}
+    .confetti{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:40}
+    .confetti span{position:absolute;font-size:22px;animation:fall 2.8s linear forwards;}
+    @keyframes fall{0%{transform:translateY(-10vh) rotate(0)}100%{transform:translateY(110vh) rotate(540deg);opacity:.1}}
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="root">
     <header class="topbar">
       <div></div>
-      <button id="langToggle" class="lang">English</button>
+      <button id="themeToggle" class="toggle" title="تبديل الوضع">🌙 الوضع الفاتح</button>
     </header>
     <h1 id="title">حاسبة سكرو</h1>
     <div id="subtitle" class="sub">أربع جولات، أقل واحد يفوز!</div>
@@ -71,39 +86,24 @@
   </div>
 
   <script>
-    // ===== I18N =====
-    var L = {
-      ar: {
-        title:'حاسبة سكرو',subtitle:'أربع جولات، أقل واحد يفوز!',placeholder:'اسم اللاعب',add:'+ إضافة',addHelp:'أضِف من 2 إلى 8 لاعبين.',delete:'حذف',clear:'مسح الكل',start:'بدء الجولات',prev:'السابق',next:'التالي',finish:'إنهاء',player:'اللاعب',roundN:function(n){return 'الجولة '+n},total:'المجموع',final:'النتائج النهائية',winner:function(name){return 'الفائز: '+name},tie:function(names){return 'تعادل! الفائزون: '+names},playAgain:'العب مجددًا',newGame:'لعبة جديدة',langBtn:'English',maxPlayers:'الحد الأقصى ٨ لاعبين.',duplicate:'الاسم مُضاف بالفعل.'
-      },
-      en: {
-        title:'Card Rounds Scorekeeper',subtitle:'Track 4 rounds, lowest total wins. Works offline on your phone.',placeholder:'Player name',add:'+ Add',addHelp:'Add 2–8 players.',delete:'Delete',clear:'Clear',start:'Start Rounds',prev:'Prev',next:'Next',finish:'Finish',player:'Player',roundN:function(n){return 'Round '+n},total:'Total',final:'Final Results',winner:function(name){return 'Winner: '+name},tie:function(names){return 'Tie! Winners: '+names},playAgain:'Play Again',newGame:'New Game',langBtn:'العربية',maxPlayers:'Maximum 8 players.',duplicate:'Name already added.'
-      }
-    };
-
     // ===== Helpers =====
     function $(sel, el){ return (el||document).querySelector(sel); }
     function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
     function sumFor(id){ return (state.scores[id]||[]).reduce(function(a,b){ return a + (Number.isFinite(b)?b:0); }, 0); }
-    function sanitizeInt(v){ var n=parseInt(String(v).replace(/[^0-9]/g,''),10); return Number.isFinite(n)?clamp(n,0,1000000):0; }
     function dotsHtml(){ return Array.from({length: state.rounds}).map(function(_,i){ return '<div class="dot '+(i===currentRound?'active':'')+'"></div>'; }).join(''); }
     function escapeHtml(str){ str = String(str||''); return str.replace(/[&<>"]/g, function(s){ if(s==='&') return '&amp;'; if(s==='<') return '&lt;'; if(s==='>') return '&gt;'; return '&quot;'; }); }
 
     // ===== State =====
-    var state = { stage: 'setup', players: [], rounds: 4, scores: {}, lang: 'ar' };
+    var state = { stage: 'setup', players: [], rounds: 4, scores: {}, theme: (localStorage.getItem('crs_theme')||'dark') };
     var currentRound = 0;
-    try{
-      var saved = JSON.parse(localStorage.getItem('crs_state'));
-      if(saved && Array.isArray(saved.players)) state = Object.assign(state, saved);
-    }catch(e){}
+    try{ var saved = JSON.parse(localStorage.getItem('crs_state')); if(saved && Array.isArray(saved.players)) state = Object.assign(state, saved); }catch(e){}
 
-    function applyLang(){
-      var dict = L[state.lang];
-      document.documentElement.lang = state.lang;
-      document.documentElement.dir  = (state.lang==='ar' ? 'rtl' : 'ltr');
-      $('#title').textContent = dict.title;
-      $('#subtitle').textContent = dict.subtitle;
-      $('#langToggle').textContent = dict.langBtn;
+    function applyTheme(){
+      document.documentElement.setAttribute('data-theme', state.theme==='light' ? 'light' : 'dark');
+      var tbtn = $('#themeToggle');
+      if(state.theme==='light'){ tbtn.textContent = '🌙 الوضع الداكن'; }
+      else { tbtn.textContent = '🌞 الوضع الفاتح'; }
+      localStorage.setItem('crs_theme', state.theme);
     }
 
     function persist(){ try{ localStorage.setItem('crs_state', JSON.stringify(state)); }catch(e){} }
@@ -111,7 +111,7 @@
 
     // ===== Render Root =====
     function render(){
-      applyLang();
+      applyTheme();
       var app = $('#app');
       app.innerHTML = '';
       if(state.stage === 'setup') renderSetup(app);
@@ -123,162 +123,106 @@
 
     // ===== Setup =====
     function renderSetup(root){
-      var dict = L[state.lang];
-      var card = document.createElement('div');
-      card.className = 'card stack';
-
-      var inputRow = document.createElement('div');
-      inputRow.className = 'row';
-      var nameInput = document.createElement('input');
-      nameInput.id = 'nameInput';
-      nameInput.type = 'text';
-      nameInput.placeholder = dict.placeholder;
-      nameInput.maxLength = 20;
-      var addBtn = document.createElement('button');
-      addBtn.className = 'btn-accent';
-      addBtn.id = 'addBtn';
-      addBtn.textContent = dict.add;
-      inputRow.appendChild(nameInput);
-      inputRow.appendChild(addBtn);
-      card.appendChild(inputRow);
-
-      var info = document.createElement('div');
-      info.className = 'small';
-      info.textContent = dict.addHelp;
-      card.appendChild(info);
-
-      var list = document.createElement('div');
-      list.className = 'players';
+      var card = document.createElement('div'); card.className = 'card stack';
+      var inputRow = document.createElement('div'); inputRow.className = 'row';
+      var nameInput = document.createElement('input'); nameInput.id = 'nameInput'; nameInput.type = 'text'; nameInput.placeholder = 'اسم اللاعب'; nameInput.maxLength = 20;
+      var addBtn = document.createElement('button'); addBtn.className = 'btn-accent'; addBtn.id = 'addBtn'; addBtn.textContent = '+ إضافة';
+      inputRow.appendChild(nameInput); inputRow.appendChild(addBtn); card.appendChild(inputRow);
+      var info = document.createElement('div'); info.className = 'small'; info.textContent = 'أضِف من 2 إلى 8 لاعبين.'; card.appendChild(info);
+      var list = document.createElement('div'); list.className = 'players';
       state.players.forEach(function(p){
-        var tag = document.createElement('div');
-        tag.className = 'player-tag';
-        var span = document.createElement('span');
-        span.className = 'player-name';
-        span.textContent = p.name;
-        var del = document.createElement('button');
-        del.className = 'btn-danger';
-        del.textContent = dict.delete;
-        del.setAttribute('data-del', p.id);
-        tag.appendChild(span);
-        tag.appendChild(del);
-        list.appendChild(tag);
+        var tag = document.createElement('div'); tag.className = 'player-tag';
+        var span = document.createElement('span'); span.className = 'player-name'; span.textContent = p.name;
+        var del = document.createElement('button'); del.className = 'btn-danger'; del.textContent = 'حذف'; del.setAttribute('data-del', p.id);
+        tag.appendChild(span); tag.appendChild(del); list.appendChild(tag);
       });
-      card.appendChild(list);
-      root.appendChild(card);
+      card.appendChild(list); root.appendChild(card);
 
       nameInput.addEventListener('keydown', function(e){ if(e.key==='Enter'){ addBtn.click(); } });
       addBtn.onclick = function(){
-        var name = nameInput.value.trim();
-        if(!name) return;
-        if(state.players.length>=8){ alert(dict.maxPlayers); return; }
-        if(state.players.some(function(p){ return p.name.toLowerCase()===name.toLowerCase(); })){ alert(dict.duplicate); return; }
+        var name = nameInput.value.trim(); if(!name) return;
+        if(state.players.length>=8){ alert('الحد الأقصى ٨ لاعبين.'); return; }
+        if(state.players.some(function(p){ return p.name.toLowerCase()===name.toLowerCase(); })){ alert('الاسم مُضاف بالفعل.'); return; }
         var id = uid();
         state.players.push({id:id, name:name});
-        state.scores[id] = Array(state.rounds).fill(0);
-        nameInput.value='';
-        render();
+        state.scores[id] = Array(state.rounds).fill(null);
+        nameInput.value=''; render();
       };
-      list.addEventListener('click', function(e){
-        var delId = e.target && e.target.getAttribute('data-del');
-        if(!delId) return;
-        state.players = state.players.filter(function(p){ return p.id!==delId; });
-        delete state.scores[delId];
-        render();
-      });
+      list.addEventListener('click', function(e){ var delId = e.target && e.target.getAttribute('data-del'); if(!delId) return; state.players = state.players.filter(function(p){ return p.id!==delId; }); delete state.scores[delId]; render(); });
     }
 
     // ===== Rounds =====
     function renderRounds(root){
-      var dict = L[state.lang];
-      var card = document.createElement('div');
-      card.className = 'card stack';
-
-      var rnd = document.createElement('div');
-      rnd.className = 'round-indicator';
-      rnd.innerHTML = dotsHtml();
-      card.appendChild(rnd);
-
-      var table = document.createElement('table');
-      table.className = 'table';
-      var head = document.createElement('tr');
-      head.className = 'tr';
-      head.innerHTML = '<td class="td small">'+dict.player+'</td>'+
-                       '<td class="td right small">'+dict.roundN(currentRound+1)+'</td>'+
-                       '<td class="td right small">'+dict.total+'</td>';
-      table.appendChild(head);
-
+      var card = document.createElement('div'); card.className = 'card stack';
+      var rnd = document.createElement('div'); rnd.className = 'round-indicator'; rnd.innerHTML = dotsHtml(); card.appendChild(rnd);
+      var table = document.createElement('table'); table.className = 'table';
+      var head = document.createElement('tr'); head.className = 'tr'; head.innerHTML = '<td class="td small">اللاعب</td><td class="td right small">الجولة '+(currentRound+1)+'</td><td class="td right small">المجموع</td>'; table.appendChild(head);
       state.players.forEach(function(p){
         var tr = document.createElement('tr'); tr.className = 'tr';
         var nameTd = document.createElement('td'); nameTd.className='td'; nameTd.textContent = p.name;
         var inputTd = document.createElement('td'); inputTd.className='td right';
-        var input = document.createElement('input'); input.type='text'; input.inputMode='numeric'; input.pattern='[0-9]*'; input.autocomplete='off'; input.enterKeyHint='done'; var initialVal = (state.scores[p.id]||[])[currentRound] || 0; input.value = String(initialVal);
-        var totalTd = document.createElement('td'); totalTd.className='td right';
-        var totalEl = document.createElement('span'); totalEl.textContent = sumFor(p.id);
-        input.addEventListener('input', function(){ var digits = input.value.replace(new RegExp('[^0-9]', 'g'), ''); input.value = digits; var val = digits === '' ? 0 : parseInt(digits,10); state.scores[p.id][currentRound] = val; totalEl.textContent = sumFor(p.id); persist(); });
-        inputTd.appendChild(input);
-        totalTd.appendChild(totalEl);
+        var input = document.createElement('input'); input.type='text'; input.inputMode='numeric'; input.pattern='[0-9]*'; input.autocomplete='off'; input.enterKeyHint='done';
+        var stored = (state.scores[p.id]||[])[currentRound]; input.value = (stored==null ? '' : String(stored));
+        var totalTd = document.createElement('td'); totalTd.className='td right'; var totalEl = document.createElement('span'); totalEl.textContent = sumFor(p.id);
+        input.addEventListener('input', function(){ var digits = input.value.replace(/\D/g,''); input.value = digits; var val = digits === '' ? null : parseInt(digits,10); state.scores[p.id][currentRound] = val; totalEl.textContent = sumFor(p.id); persist(); });
+        inputTd.appendChild(input); totalTd.appendChild(totalEl);
         tr.appendChild(nameTd); tr.appendChild(inputTd); tr.appendChild(totalTd);
         table.appendChild(tr);
       });
-      card.appendChild(table);
-      root.appendChild(card);
+      card.appendChild(table); root.appendChild(card);
     }
 
     // ===== Results =====
     function renderResults(root){
-      var dict = L[state.lang];
       var card = document.createElement('div'); card.className='card stack';
       var totals = state.players.map(function(p){ return {id:p.id,name:p.name,total:sumFor(p.id)}; });
       var min = Math.min.apply(null, totals.map(function(t){return t.total;}));
       var winners = totals.filter(function(t){return t.total===min;}).map(function(t){return t.name;});
-
-      var pill = document.createElement('div'); pill.className='pill'; pill.textContent=dict.final; card.appendChild(pill);
+      if(winners.length===1){ celebrate(winners[0]); }
+      var pill = document.createElement('div'); pill.className='pill'; pill.textContent='النتائج النهائية'; card.appendChild(pill);
       totals.sort(function(a,b){return a.total-b.total;});
-      totals.forEach(function(t,idx){
-        var row = document.createElement('div'); row.className='result-box '+(t.total===min?'winner':'loser');
-        row.innerHTML = '<div><strong>#'+(idx+1)+'</strong> '+escapeHtml(t.name)+'</div><div><strong>'+t.total+'</strong></div>';
-        card.appendChild(row);
-      });
-      var note = document.createElement('div'); note.className='small';
-      note.innerHTML = winners.length>1 ? (dict.tie(winners.map(escapeHtml).join(', '))) : (dict.winner(escapeHtml(winners[0])));
-      card.appendChild(note);
-      root.appendChild(card);
+      totals.forEach(function(t,idx){ var row = document.createElement('div'); row.className='result-box '+(t.total===min?'winner':'loser'); row.innerHTML = '<div><strong>#'+(idx+1)+'</strong> '+escapeHtml(t.name)+'</div><div><strong>'+t.total+'</strong></div>'; card.appendChild(row); });
+      var note = document.createElement('div'); note.className='small'; note.textContent = (winners.length>1) ? ('تعادل! الفائزون: '+winners.join(', ')) : ('الفائز: '+winners[0]); card.appendChild(note); root.appendChild(card);
+    }
+
+    function celebrate(name){
+      var conf = document.createElement('div'); conf.className='confetti';
+      for(var i=0;i<60;i++){ var s=document.createElement('span'); s.textContent = (i%3===0?'🎉':(i%3===1?'✨':'🎊')); s.style.left = Math.random()*100+'%'; s.style.animationDelay = (Math.random()*0.8)+'s'; conf.appendChild(s);}    
+      document.body.appendChild(conf);
+      var wrap = document.createElement('div'); wrap.className='celebrate'; var banner = document.createElement('div'); banner.className='banner'; banner.innerHTML = '🎉 مبروك <strong>'+escapeHtml(name)+'</strong>!'; wrap.appendChild(banner); document.body.appendChild(wrap);
+      setTimeout(function(){ conf.remove(); wrap.remove(); }, 3200);
     }
 
     // ===== Footer =====
     function renderFooter(){
-      var dict = L[state.lang];
       var footer = $('#footer'); footer.innerHTML='';
       if(state.stage==='setup'){
         var canStart = state.players.length>=2 && state.players.length<=8;
         var wrap = document.createElement('div'); wrap.className='row';
-        var clearBtn = document.createElement('button'); clearBtn.className='btn-secondary'; clearBtn.id='clearBtn'; clearBtn.textContent=dict.clear;
-        var startBtn = document.createElement('button'); startBtn.className='btn'; startBtn.id='startBtn'; startBtn.textContent=dict.start; if(!canStart) startBtn.disabled = true;
+        var clearBtn = document.createElement('button'); clearBtn.className='btn-secondary'; clearBtn.textContent='مسح الكل';
+        var startBtn = document.createElement('button'); startBtn.className='btn'; startBtn.textContent='بدء الجولات'; if(!canStart) startBtn.disabled = true;
         wrap.appendChild(clearBtn); wrap.appendChild(startBtn); footer.appendChild(wrap);
-        clearBtn.onclick = function(){ if(confirm('OK?')){ state.players=[]; state.scores={}; render(); } };
+        clearBtn.onclick = function(){ if(confirm('متأكد؟')){ state.players=[]; state.scores={}; render(); } };
         startBtn.onclick = function(){ currentRound=0; state.stage='rounds'; render(); };
       } else if(state.stage==='rounds'){
         var wrap2 = document.createElement('div'); wrap2.className='row';
-        var backBtn = document.createElement('button'); backBtn.className='btn-secondary'; backBtn.id='backBtn'; backBtn.textContent=dict.prev; if(currentRound===0) backBtn.disabled = true;
-        var nextBtn = document.createElement('button'); nextBtn.className='btn-accent'; nextBtn.id='nextBtn'; nextBtn.textContent = (currentRound===state.rounds-1?dict.finish:dict.next);
+        var backBtn = document.createElement('button'); backBtn.className='btn-secondary'; backBtn.textContent='السابق'; if(currentRound===0) backBtn.disabled = true;
+        var nextBtn = document.createElement('button'); nextBtn.className='btn-accent'; nextBtn.textContent = (currentRound===state.rounds-1?'إنهاء':'التالي');
         wrap2.appendChild(backBtn); wrap2.appendChild(nextBtn); footer.appendChild(wrap2);
         backBtn.onclick = function(){ if(currentRound>0){ currentRound--; render(); } };
         nextBtn.onclick = function(){ if(currentRound<state.rounds-1){ currentRound++; render(); } else { state.stage='results'; render(); } };
       } else {
         var wrap3 = document.createElement('div'); wrap3.className='grid grid-cols-2';
-        var againBtn = document.createElement('button'); againBtn.className='btn-secondary'; againBtn.id='againBtn'; againBtn.textContent=dict.playAgain;
-        var newBtn = document.createElement('button'); newBtn.className='btn'; newBtn.id='newBtn'; newBtn.textContent=dict.newGame;
+        var againBtn = document.createElement('button'); againBtn.className='btn-secondary'; againBtn.textContent='العب ثانية';
+        var newBtn = document.createElement('button'); newBtn.className='btn'; newBtn.textContent='لعبة جديدة';
         wrap3.appendChild(againBtn); wrap3.appendChild(newBtn); footer.appendChild(wrap3);
-        againBtn.onclick = function(){ Object.keys(state.scores).forEach(function(id){ state.scores[id]=Array(state.rounds).fill(0); }); currentRound=0; state.stage='rounds'; render(); };
+        againBtn.onclick = function(){ Object.keys(state.scores).forEach(function(id){ state.scores[id]=Array(state.rounds).fill(null); }); currentRound=0; state.stage='rounds'; render(); };
         newBtn.onclick = function(){ state.players=[]; state.scores={}; state.stage='setup'; currentRound=0; render(); };
       }
     }
 
-    // ===== Language Toggle =====
-    $('#langToggle').addEventListener('click', function(){
-      state.lang = state.lang==='ar' ? 'en' : 'ar';
-      render();
-    });
+    // Theme toggle
+    $('#themeToggle').addEventListener('click', function(){ state.theme = (state.theme==='light' ? 'dark' : 'light'); applyTheme(); });
 
     // init
     render();
