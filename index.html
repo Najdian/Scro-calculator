@@ -65,7 +65,7 @@
       <button id="langToggle" class="lang">English</button>
     </header>
     <h1 id="title">حاسبة سكرو</h1>
-    <div id="subtitle" class="sub">٤ جولات، أقل مجموع يفوز!</div>
+    <div id="subtitle" class="sub">أربع جولات، أقل واحد يفوز!</div>
     <div id="app" class="stack"></div>
     <div class="footer-cta" id="footer"></div>
   </div>
@@ -74,7 +74,7 @@
     // ===== I18N =====
     var L = {
       ar: {
-        title:'حاسبة سكرو',subtitle:'٤ جولات، أقل مجموع يفوز!',placeholder:'اسم اللاعب',add:'+ إضافة',addHelp:'أضِف من 2 إلى 8 لاعبين.',delete:'حذف',clear:'مسح الكل',start:'بدء الجولات',prev:'السابق',next:'التالي',finish:'إنهاء',player:'اللاعب',roundN:function(n){return 'الجولة '+n},total:'المجموع',final:'النتائج النهائية',winner:function(name){return 'الفائز: '+name},tie:function(names){return 'تعادل! الفائزون: '+names},playAgain:'العب مجددًا',newGame:'لعبة جديدة',langBtn:'English',maxPlayers:'الحد الأقصى ٨ لاعبين.',duplicate:'الاسم مُضاف بالفعل.'
+        title:'حاسبة سكرو',subtitle:'أربع جولات، أقل واحد يفوز!',placeholder:'اسم اللاعب',add:'+ إضافة',addHelp:'أضِف من 2 إلى 8 لاعبين.',delete:'حذف',clear:'مسح الكل',start:'بدء الجولات',prev:'السابق',next:'التالي',finish:'إنهاء',player:'اللاعب',roundN:function(n){return 'الجولة '+n},total:'المجموع',final:'النتائج النهائية',winner:function(name){return 'الفائز: '+name},tie:function(names){return 'تعادل! الفائزون: '+names},playAgain:'العب مجددًا',newGame:'لعبة جديدة',langBtn:'English',maxPlayers:'الحد الأقصى ٨ لاعبين.',duplicate:'الاسم مُضاف بالفعل.'
       },
       en: {
         title:'Card Rounds Scorekeeper',subtitle:'Track 4 rounds, lowest total wins. Works offline on your phone.',placeholder:'Player name',add:'+ Add',addHelp:'Add 2–8 players.',delete:'Delete',clear:'Clear',start:'Start Rounds',prev:'Prev',next:'Next',finish:'Finish',player:'Player',roundN:function(n){return 'Round '+n},total:'Total',final:'Final Results',winner:function(name){return 'Winner: '+name},tie:function(names){return 'Tie! Winners: '+names},playAgain:'Play Again',newGame:'New Game',langBtn:'العربية',maxPlayers:'Maximum 8 players.',duplicate:'Name already added.'
@@ -211,10 +211,10 @@
         var tr = document.createElement('tr'); tr.className = 'tr';
         var nameTd = document.createElement('td'); nameTd.className='td'; nameTd.textContent = p.name;
         var inputTd = document.createElement('td'); inputTd.className='td right';
-        var input = document.createElement('input'); input.type='number'; input.min='0'; input.value = (state.scores[p.id]||[])[currentRound] || 0;
+        var input = document.createElement('input'); input.type='text'; input.inputMode='numeric'; input.pattern='[0-9]*'; input.autocomplete='off'; input.enterKeyHint='done'; var initialVal = (state.scores[p.id]||[])[currentRound] || 0; input.value = String(initialVal);
         var totalTd = document.createElement('td'); totalTd.className='td right';
         var totalEl = document.createElement('span'); totalEl.textContent = sumFor(p.id);
-        input.oninput = function(){ state.scores[p.id][currentRound] = sanitizeInt(input.value); totalEl.textContent = sumFor(p.id); persist(); };
+        input.addEventListener('input', function(){ var digits = input.value.replace(new RegExp('[^0-9]', 'g'), ''); input.value = digits; var val = digits === '' ? 0 : parseInt(digits,10); state.scores[p.id][currentRound] = val; totalEl.textContent = sumFor(p.id); persist(); });
         inputTd.appendChild(input);
         totalTd.appendChild(totalEl);
         tr.appendChild(nameTd); tr.appendChild(inputTd); tr.appendChild(totalTd);
